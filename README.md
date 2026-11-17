@@ -7,7 +7,7 @@ Aplicación exploratoria con Pandas, scikit-learn, Streamlit y Plotly. Cada fila
 ## Entrega
 
 - [Repositorio público](https://github.com/victoriailla2607/ucu-california-housing-streamlit)
-- Aplicación en Streamlit Community Cloud: pendiente de finalizar el despliegue.
+- [Aplicación desplegada en Streamlit Community Cloud](https://ucu-california-housing-victoria-illa.streamlit.app/)
 
 ## Ejecutar localmente
 
