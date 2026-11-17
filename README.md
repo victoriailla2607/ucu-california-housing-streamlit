@@ -1,99 +1,80 @@
-# Proyecto
+# Viviendas de California · Streamlit
 
-## Análisis Interactivo de Datos con Streamlit
+Proyecto de Programación para Análisis de Datos (UCU), creado desde el [template de la asignatura](https://github.com/hchocobar/ucu-pad-project-data-analysis-with-streamlit).
 
+Aplicación exploratoria con Pandas, scikit-learn, Streamlit y Plotly. Cada fila representa un grupo de bloques censales de California en 1990.
 
-**Objetivo:** Desarrollar una aplicación interactiva en **Streamlit** que cargue, analice y visualice un conjunto de datos estándar, aplicando conceptos de manipulación de datos con **Pandas** e integración de *widgets* interactivos.
+## Entrega
 
+- [Repositorio público](https://github.com/victoriailla2607/ucu-california-housing-streamlit)
+- Aplicación en Streamlit Community Cloud: pendiente de finalizar el despliegue.
 
+## Ejecutar localmente
 
-## Dataset Seleccionado: Boston House Prices
+Requiere Python 3.12 o superior. Se recomienda un entorno virtual.
 
-Utilizaremos el *dataset* de precios de viviendas de California, un conjunto de datos clásico de regresión (que reemplazó al de Boston)
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
 
-* **Librería de Origen:** `sklearn.datasets`
-* **Nombre de la Función:** `sklearn.datasets.fetch_california_housing()`
-* **Fuente:** Este dataset fue creado a partir de datos del censo de 1990 en California.
-* **Documentación:** https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html
+La primera ejecución descarga el dataset oficial mediante `fetch_california_housing()`: requiere acceso a Internet. Las ejecuciones siguientes reutilizan la caché. Si falla la descarga, la aplicación muestra un mensaje y permite reintentar.
 
-### Descripción del Dataset
+## Funcionalidades y correspondencia con la consigna
 
-El *dataset* de California contiene datos sobre la mediana de ingresos, la edad de las casas y otras métricas geográficas y socioeconómicas a nivel de grupo de bloques (la unidad geográfica más pequeña para la que la Oficina del Censo de EE. UU. publica datos de muestra).
+| Requisito | Implementación |
+| --- | --- |
+| DataFrame único `df_california` | Ocho características con `feature_names` más `MedHouseVal` |
+| Preparación inicial | Pestaña de carga y calidad: primeras cinco filas, tipos y faltantes por columna |
+| Barra lateral | Título y explicación con `st.sidebar.markdown()` |
+| Edad mediana | Slider con mínimo y máximo reales de `HouseAge` y límites inclusivos |
+| Latitud mínima | `number_input` y checkbox para activar o desactivar el filtro |
+| Resumen descriptivo | Mediana y rango máximo menos mínimo de `MedHouseVal` sobre la selección |
+| Visualización dinámica | Histograma y dispersión `MedInc` frente a `MedHouseVal`, ambos con todos los registros filtrados |
+| Mapa opcional | `st.map()` con coordenadas de la selección |
+| Resultados vacíos | Aviso explícito; no se muestran estadísticas indefinidas ni gráficos vacíos |
+| Exportación adicional | Descarga del conjunto filtrado en CSV |
 
-| Característica | Descripción |
-| :--- | :--- |
-| HouseAge | Mediana de la edad de las casas dentro del grupo de bloques. |
-| AveRooms | Promedio de habitaciones por hogar.|
-| AveBedrms | Promedio de dormitorios por hogar. |
-| Population | Población del grupo de bloques. |
-| Latitude | Latitud del centro geográfico del grupo de bloques. |
-| Longitude | Longitud del centro geográfico del grupo de bloques. |
-| MedHouseVal (Target) | Mediana del valor de la vivienda (en cientos de miles de dólares). |
+El título del template menciona Boston, pero su instrucción y función de carga especifican **California Housing**, que es el dataset utilizado aquí. La sección de latitud menciona tanto checkbox como campo numérico: se incluyen ambos, con el filtro activado inicialmente.
 
----
+## Datos y unidades
 
-## Actividades Requeridas del Proyecto
+El dataset incluye 20.640 grupos censales y ocho características: `MedInc`, `HouseAge`, `AveRooms`, `AveBedrms`, `Population`, `AveOccup`, `Latitude` y `Longitude`. La variable objetivo es `MedHouseVal`.
 
-El proyecto se dividirá en cuatro fases: 
-- Carga y Preparación de Datos (Pandas), 
-- Análisis Descriptivo Interactivo (Streamlit), y 
-- Visualización Dinámica.
-- Despliegue en la Nube
+- `MedHouseVal`: cientos de miles de USD. Por ejemplo, 2,0 equivale a USD 200.000.
+- `MedInc`: decenas de miles de USD.
+- Los valores corresponden a 1990 y no están ajustados por inflación.
+- El target tiene un límite superior cercano a 5,00001: afecta la interpretación de la distribución.
+- Una asociación entre ingresos y valores de vivienda no demuestra causalidad. No se entrena un modelo predictivo.
 
-### Fase 1: Carga y Preparación de Datos con Pandas
+Fuentes: [API de carga](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) y [descripción del dataset](https://scikit-learn.org/stable/datasets/real_world.html#california-housing-dataset).
 
-Deberás cargar el *dataset* desde `sklearn.datasets` y convertirlo en un único **Pandas DataFrame** llamado `df_california`.
+## Estructura
 
-1.  **Carga y Estructura:** Cargar las características (`data`) y la variable objetivo (`target`) utilizando `fetch_california_housing()`. Combinar ambas en un único `df_california`, asegurando que las columnas tengan los nombres correctos proporcionados por el dataset (`feature_names`).
-2.  **Preparación Inicial (Pandas):**
-    * Verificar si hay valores faltantes.
-    * Mostrar las **primeras 5 filas** y el **tipo de dato** de cada columna utilizando `st.dataframe()` y `st.write()` en Streamlit.
+```text
+app.py                       # Aplicación y funciones de carga/filtro
+requirements.txt             # Dependencias
+notebooks/practice.ipynb     # Análisis exploratorio reproducible
+tests/test_app.py            # Pruebas con datos reales y Streamlit AppTest
+```
 
-### Fase 2: Análisis Descriptivo Interactivo (Streamlit Widgets)
+## Pruebas
 
-Esta fase se centra en usar los *widgets* de Streamlit para permitir al usuario explorar los datos.
+```bash
+python -m unittest discover -s tests -v
+```
 
-1.  **Sidebar de Control (`st.sidebar`):**
-    * Implementar un `st.sidebar.markdown()` para el título y descripción de los filtros.
-2.  **Filtro por Estilo de Vivienda (`st.slider`):**
-    * Crear un **slider** que permita al usuario seleccionar un rango de la Edad Mediana de la Casa (HouseAge).
-    * Rango: El rango del slider debe ir desde el mínimo hasta el máximo de la columna HouseAge.
-    * Filtrar el DataFrame para incluir solo las viviendas cuya edad mediana caiga dentro del rango seleccionado por el usuario.
-3.  **Filtro de Vecindario (`st.checkbox`):**
-    * Implementar un campo de entrada numérico (`st.number_input`) que permita al usuario establecer la Latitud Mínima.
-    * Filtrar el DataFrame para incluir solo los grupos de bloques con una Latitude mayor o igual al valor ingresado.
-4.  **Resumen Descriptivo:**
-    * Mostrar la mediana y el rango (Máximo - Mínimo) del valor de la vivienda MedHouseVal del DataFrame resultante después de aplicar todos los filtros.
+Las pruebas verifican estructura y faltantes del dataset, límites de filtros, métricas y tabla filtrada, selección vacía, desactivación de latitud y mapa. Requieren Internet en la primera descarga.
 
-### Fase 3: Visualización Dinámica
+## Despliegue en Streamlit Community Cloud
 
-Deberás mostrar la relación entre las variables utilizando gráficos que se actualicen automáticamente con los filtros de la Fase 2.
+1. Iniciar sesión en [Streamlit Community Cloud](https://share.streamlit.io/) con la cuenta de GitHub.
+2. Elegir **Create app** y el repositorio `victoriailla2607/ucu-california-housing-streamlit`.
+3. Seleccionar rama `main`, archivo `app.py` y Python 3.12 en las opciones avanzadas.
+4. Pulsar **Deploy**. No se necesitan secretos ni claves.
+5. Verificar filtros y gráficos; copiar la URL pública a la sección Entrega.
 
-1.  **Gráfico de Distribución del Target (`st.pyplot` o `st.plotly_chart`):**
-    * Crear un **histograma** de la variable objetivo (**MedHouseVal**) utilizando una librería externa (como Matplotlib o Plotly).
-    * **Requisito:** El gráfico debe reflejar la distribución de los datos **después** de aplicar los filtros del usuario.
-2.  **Gráfico de Dispersión (Regresión):**
-    * Crear Crear un gráfico de dispersión (scatter plot) que muestre la relación entre la Mediana de Ingresos (MedInc) (eje X) y el Valor Mediano de la Vivienda (MedHouseVal) (eje Y).
-    * **Requisito:** Este gráfico también debe actualizarse con los datos filtrados y ser lo suficientemente informativo (ej. incluir etiquetas y un título).
-3.  ** Opcional - Mapa Geográfico** (Streamlit Nativo o Plotly):
-    * Utilizar la función nativa de Streamlit (st.map()) o un gráfico de dispersión de Plotly con st.plotly_chart() para mapear los grupos de bloques filtrados usando las columnas Latitude y Longitude.
-    * Requisito: El mapa debe mostrar la distribución geográfica de las viviendas filtradas por el usuario.
-
----
-
-## Fase 4: Despliegue en la Nube
-
-Deberás preparar tu proyecto para el despliegue.
-
-1.  **Git/GitHub:** Crear un **repositorio público** en GitHub a partir de este template.
-
-2.  **Estructura de Carpeta:**
-    * `app.py` (código de Streamlit).
-    * `notebooks/practice.ipynb` en este archivo puedes realizar un análisis previo del dataset propuesto
-    * `requirements.txt` (listado de dependencias: `streamlit`, `pandas`, `scikit-learn`, `matplotlib` o `plotly`).
-
-3.  **Despliegue:** Desplegar la aplicación final utilizando **Streamlit Community Cloud** (share.streamlit.io).
-
-Deberás entregar: 
-- el **enlace a la aplicación desplegada** y 
-- el **enlace al repositorio de GitHub**.
+En WebAsignatura se presentan el enlace al repositorio y el enlace de la aplicación. La fecha exacta no está indicada en la consigna compartida.
